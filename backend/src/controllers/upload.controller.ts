@@ -2,7 +2,17 @@ import { Request, Response } from "express";
 import { readFile } from "fs";
 import path from "path";
 
+/**
+ * Controller class for handling file uploads and retrieval.
+ */
 class UploadController {
+  /**
+   * Creates a new upload.
+   * 
+   * @param {Request} req - The request object.
+   * @param {Response} res - The response object.
+   * @returns {Response} The response containing the created upload data or an error message.
+   */
   async create(req: Request, res: Response) {
     try {
       const base_url = process.env.BASE_URL;
@@ -27,6 +37,11 @@ class UploadController {
     }
   }
 
+  /**
+   * Retrieves an image file from the server and sends it as a response.
+   * @param req - The request object.
+   * @param res - The response object.
+   */
   async get(req: Request, res: Response) {
     try {
       const { filename } = req.params;
