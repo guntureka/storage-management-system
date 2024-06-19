@@ -35,12 +35,3 @@ export const upload = multer({
   },
 });
 
-// export const upload = (options?: multer.Options) =>
-//   multer({
-//     storage: options?.storage || storage,
-//     fileFilter: options?.fileFilter || multerFilter,
-//     limits: {
-//       fileSize: options?.limits?.fileSize || FILE_SIZE,
-//       files: options?.limits?.files || FILES,
-//     },
-//   });

@@ -5,10 +5,6 @@ import express from "express";
 export const authRoute = express.Router();
 
 authRoute.post("/login", AuthenticationController.login);
-authRoute.post(
-  "/register",
-  upload.single("image"),
-  AuthenticationController.register
-);
+authRoute.post("/register", AuthenticationController.register);
 
 export default authRoute;

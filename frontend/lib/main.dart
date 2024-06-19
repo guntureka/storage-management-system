@@ -6,8 +6,10 @@ import 'package:frontend/pages/register_page.dart';
 import 'package:frontend/pages/update_product_page.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
+  await _userCheck();
   runApp(const MyApp());
 }
 
@@ -55,10 +57,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class RouteState extends GetxController {
-  final RxString currentRoute = ''.obs;
+Future<void> _userCheck() async {
+  final prefs = await SharedPreferences.getInstance();
+  final userData = prefs.getString('user');
 
-  void updateRoute(String newRoute) {
-    currentRoute.value = newRoute;
+  if (userData != null) {
+    Get.offAllNamed("/");
+  } else {
+    Get.offAllNamed('/login');
   }
 }
