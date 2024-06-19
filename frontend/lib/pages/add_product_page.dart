@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend/controllers/add_product_controller.dart';
 import 'package:frontend/models/category_model.dart';
+import 'package:frontend/utils/dio_helper.dart';
 import 'package:get/get.dart';
 
-class AddProduct extends GetView<AddProductController> {
-  const AddProduct({super.key});
+class AddProductPage extends GetView<AddProductController> {
+  const AddProductPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +16,8 @@ class AddProduct extends GetView<AddProductController> {
       AddProductController(),
     );
     return Scaffold(
+      appBar: _appBarUI(context),
+      drawer: _drawerUI(context),
       body: _bodyUI(context),
     );
   }
@@ -41,6 +44,96 @@ class AddProduct extends GetView<AddProductController> {
             child: _formUI(context),
           ),
         ],
+      ),
+    );
+  }
+
+  PreferredSizeWidget _appBarUI(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      actions: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 10, 20, 10),
+          child: Obx(
+            () => CircleAvatar(
+              backgroundImage: controller.user.value != null
+                  ? NetworkImage(
+                      "$BASE_URL/api/uploads/${controller.user.value?.image}")
+                  : null,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _drawerUI(BuildContext context) {
+    return Obx(
+      () => Drawer(
+        backgroundColor: Colors.black,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.black,
+              ),
+              child: Text(
+                'Welcome,\n${controller.user.value?.username}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.home,
+                color: Colors.white,
+              ),
+              title: const Text(
+                'Home',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              onTap: () {
+                Get.offAllNamed('/');
+              },
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.shopping_bag,
+                color: Colors.white,
+              ),
+              title: const Text(
+                'Add Product',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              onTap: () {
+                Get.offAllNamed('/add-product');
+              },
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.exit_to_app,
+                color: Colors.white,
+              ),
+              title: const Text(
+                'Exit',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              onTap: () {
+                controller.handleExit();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -106,7 +199,7 @@ class AddProduct extends GetView<AddProductController> {
                     isExpanded: true,
                     // elevation: 0,
                     dropdownColor: Colors.white,
-                    value: controller.category.value,
+                    value: controller.selectedCategory.value,
 
                     items: controller.categories
                         .map((category) => DropdownMenuItem<Category>(
@@ -114,8 +207,8 @@ class AddProduct extends GetView<AddProductController> {
                               child: Text(category.name),
                             ))
                         .toList(),
-                    onChanged: (Category? selectedCategory) {
-                      controller.handleSelectedCategory(selectedCategory);
+                    onChanged: (selectedCategory) {
+                      controller.selectedCategory(selectedCategory);
                     },
                   ),
                 ),
@@ -129,29 +222,31 @@ class AddProduct extends GetView<AddProductController> {
           const SizedBox(
             height: 20,
           ),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed:
-                  controller.isLoading.value ? null : controller.handleSubmit,
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all(Colors.black),
-                padding: WidgetStateProperty.all(
-                  const EdgeInsetsDirectional.symmetric(
-                    vertical: 20,
+          Obx(
+            () => SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed:
+                    controller.isLoading.value ? null : controller.handleSubmit,
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(Colors.black),
+                  padding: WidgetStateProperty.all(
+                    const EdgeInsetsDirectional.symmetric(
+                      vertical: 20,
+                    ),
                   ),
                 ),
-              ),
 
-              clipBehavior: Clip.none, // Optional for rounded corners
-              child: controller.isLoading.value
-                  ? const CircularProgressIndicator(
-                      color: Colors.white,
-                    )
-                  : const Text(
-                      'Submit',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                clipBehavior: Clip.none, // Optional for rounded corners
+                child: controller.isLoading.value
+                    ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
+                    : const Text(
+                        'Submit',
+                        style: TextStyle(color: Colors.white),
+                      ),
+              ),
             ),
           ),
           const SizedBox(

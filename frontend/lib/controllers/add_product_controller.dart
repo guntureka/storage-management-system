@@ -5,6 +5,8 @@ import 'package:frontend/models/api_response_model.dart';
 import 'package:frontend/models/category_model.dart';
 import 'package:frontend/models/user_model.dart';
 import 'package:frontend/services/category_service.dart';
+import 'package:frontend/services/product_service.dart';
+import 'package:frontend/services/upload_service.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +19,7 @@ class AddProductController extends GetxController {
 
   RxBool isLoading = false.obs;
   final Rx<User?> user = Rx<User?>(null);
-  Rx<Category?> category = Rx<Category?>(null);
+  Rx<Category?> selectedCategory = Rx<Category?>(null);
   RxList<Category> categories = <Category>[].obs;
   Rx<XFile?> imageFile = Rx<XFile?>(null);
   final RxString imagePath = "".obs;
@@ -86,14 +88,19 @@ class AddProductController extends GetxController {
     }
   }
 
-  void handleSelectedCategory(Category? selectedCategory) async {
-    category.value = selectedCategory;
+  void handleSelectedCategory(Category category) async {
+    selectedCategory.value = category;
   }
 
   Future handleSubmit() async {
     if (addProductKey.currentState!.validate()) {
-      if (category.value == null) {
+      isLoading.value = true;
+      ProductService productService = Get.put(ProductService());
+      UploadService uploadService = Get.put(UploadService());
+
+      if (selectedCategory.value == null) {
         isLoading.value = false;
+
         return Get.snackbar(
           "Error",
           "Please select category!",
@@ -101,8 +108,94 @@ class AddProductController extends GetxController {
           colorText: Colors.white,
         );
       }
-      
-      
+
+      if (imageFile.value == null || imagePath.value == "") {
+        isLoading.value = false;
+
+        return Get.snackbar(
+          "Error",
+          "Please select an image!",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+
+      final imageResponse = await uploadService.uploadImage(imageFile.value!);
+
+      if (imageResponse == null) {
+        isLoading.value = false;
+        return Get.snackbar(
+          "Error",
+          "Something went wrong!",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+
+      ImageApiResponse imageApiResponse =
+          ImageApiResponse.fromJson(imageResponse);
+
+      if (imageApiResponse.error != null) {
+        isLoading.value = false;
+        return Get.snackbar(
+          "Error",
+          imageApiResponse.error!,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+
+      String? imageName = imageApiResponse.data!.filename;
+
+      final addProductResponse = await productService.create(
+        nameController.text,
+        int.tryParse(quantityController.text),
+        imageName,
+        selectedCategory.value!.id,
+        user.value!.username,
+      );
+
+      if (imageResponse == null) {
+        isLoading.value = false;
+        return Get.snackbar(
+          "Error",
+          "Something went wrong!",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+
+      ProductAddApiResponse productAddApiResponse =
+          ProductAddApiResponse.fromJson(addProductResponse);
+
+      if (productAddApiResponse.error != null) {
+        isLoading.value = false;
+        return Get.snackbar(
+          "Error",
+          productAddApiResponse.error!,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+
+      isLoading.value = false;
+
+      Get.offAllNamed('/');
+
+      return Get.snackbar(
+        "Success",
+        "Product added successful",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
     }
+  }
+
+  Future<void> handleExit() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('user');
+    user.value = null;
+
+    Get.offAllNamed('/login');
   }
 }

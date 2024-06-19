@@ -3,14 +3,17 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frontend/models/api_response_model.dart';
 import 'package:frontend/models/category_model.dart';
+import 'package:frontend/models/product_model.dart';
 import 'package:frontend/models/user_model.dart';
 import 'package:frontend/services/category_service.dart';
+import 'package:frontend/services/product_service.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends GetxController {
   RxBool isLoading = false.obs;
   RxList<Category> categories = <Category>[].obs;
+  RxList<Product> products = <Product>[].obs;
   Rx<User?> user = Rx<User?>(null);
 
   @override
@@ -18,6 +21,7 @@ class HomeController extends GetxController {
     super.onInit();
     _getUserFromStorage();
     _getCategory();
+    _getProduct();
   }
 
   Future _getCategory() async {
@@ -50,8 +54,14 @@ class HomeController extends GetxController {
       );
     }
 
-    categories.value = categoryApiResponse.data!;
+    final List<Category> categoriesData = [
+      Category(id: "all", name: "All"),
+      ...categoryApiResponse.data!
+    ];
+
+    categories.value = categoriesData;
     isLoading.value = false;
+    update();
   }
 
   Future<void> _getUserFromStorage() async {
@@ -72,10 +82,86 @@ class HomeController extends GetxController {
     prefs.remove('user');
     user.value = null;
 
-    Get.offAllNamed('/login');
+    Get.offNamed('/login');
   }
 
-  void handleHome() async {
-    Get.offAllNamed('/');
+  Future _getProduct() async {
+    isLoading.value = true;
+
+    ProductService productService = Get.put(ProductService());
+
+    final productResponse = await productService.getAll();
+
+    if (productResponse == null) {
+      isLoading.value = false;
+      return Get.snackbar(
+        "Error",
+        "Something went wrong!",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+
+    ProductApiResponse productApiResponse =
+        ProductApiResponse.fromJson(productResponse);
+
+    if (productApiResponse.error != null) {
+      isLoading.value = false;
+      return Get.snackbar(
+        "Error",
+        productApiResponse.error!,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+
+    products.value = productApiResponse.data!;
+
+    isLoading.value = false;
+  }
+
+  Future handleSelectedCategories(String id) async {
+    isLoading.value = true;
+
+    ProductService productService = Get.put(ProductService());
+
+    final dynamic productResponse;
+
+    if (id == "all") {
+      productResponse = await productService.getAll();
+    } else {
+      productResponse = await productService.getByCategoryId(id);
+    }
+
+    if (productResponse == null) {
+      isLoading.value = false;
+      return Get.snackbar(
+        "Error",
+        "Something went wrong!",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+
+    ProductApiResponse productApiResponse =
+        ProductApiResponse.fromJson(productResponse);
+
+    if (productApiResponse.error != null) {
+      isLoading.value = false;
+      return Get.snackbar(
+        "Error",
+        productApiResponse.error!,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+
+    products.value = productApiResponse.data!;
+
+    isLoading.value = false;
+  }
+
+  void handleUpdatePage(String id) {
+    Get.offAndToNamed('/update-product/$id');
   }
 }

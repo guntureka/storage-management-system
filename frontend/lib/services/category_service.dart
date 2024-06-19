@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:frontend/utils/dio_helper.dart';
 
 class CategoryService {
@@ -7,7 +9,7 @@ class CategoryService {
 
       return response.data;
     } catch (e) {
-      rethrow;
+      log(e.toString());
     }
   }
 }

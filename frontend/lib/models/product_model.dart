@@ -28,6 +28,7 @@ class Product {
       quantity: json['quantity'],
       image: json['image'],
       categoryId: json['categoryId'],
+      createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
       createdBy: json['createdBy'],
       updatedBy: json['updatedBy'],

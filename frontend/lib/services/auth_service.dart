@@ -1,12 +1,11 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:frontend/models/user_model.dart';
 import 'package:frontend/utils/dio_helper.dart';
 
 class AuthService {
-  Future<dynamic> login(
-    String username,
-    String password,
-  ) async {
+  Future<dynamic> login(String username, String password) async {
     try {
       final User user = User(
         username: username,
@@ -17,15 +16,12 @@ class AuthService {
 
       return response.data;
     } catch (e) {
-      rethrow;
+      log(e.toString());
     }
   }
 
   Future<dynamic> register(
-    String username,
-    String password,
-    String? image,
-  ) async {
+      String username, String password, String? image) async {
     try {
       final User user = User(
         username: username,
@@ -40,7 +36,7 @@ class AuthService {
 
       return response.data;
     } catch (e) {
-      rethrow;
+      log(e.toString());
     }
   }
 }

@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import { readFile } from "fs";
+import path from "path";
 
 class UploadController {
   async create(req: Request, res: Response) {
@@ -27,6 +29,19 @@ class UploadController {
 
   async get(req: Request, res: Response) {
     try {
+      const { filename } = req.params;
+
+      const imagePath = path.join("public", "uploads", filename);
+
+      readFile(imagePath, (err, data) => {
+        if (err) {
+          return res.status(404).send("Image not found");
+        }
+
+        res.setHeader("Content-Type", "image/*");
+
+        res.send(data);
+      });
     } catch (error) {
       return res
         .status(500)

@@ -26,7 +26,7 @@ productRoute.get("/:id", ProductController.getById);
  * @route GET /:id
  * @param {string} id - The ID of the category.
  */
-productRoute.get("/categories/:id", ProductController.getByCategoryId);
+productRoute.get("/category/:id", ProductController.getByCategoryId);
 
 /**
  * Route to create a new product.

@@ -4,12 +4,7 @@ class User {
   final String? password;
   final String? image;
 
-  User({
-    this.id,
-    this.username,
-    this.password,
-    this.image,
-  });
+  User({this.id, this.username, this.password, this.image});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(

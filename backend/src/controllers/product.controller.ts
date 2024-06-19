@@ -12,7 +12,11 @@ class ProductController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const response = await db.product.findMany();
+      const response = await db.product.findMany({
+        orderBy: {
+          updatedAt: "asc",
+        },
+      });
 
       res.status(200).json({ data: response, error: null, status: 200 });
     } catch (error) {
@@ -72,6 +76,9 @@ class ProductController {
         where: {
           categoryId: id,
         },
+        orderBy: {
+          updatedAt: "asc",
+        },
       });
 
       res.status(200).json({ data: response, error: null, status: 200 });
@@ -129,7 +136,7 @@ class ProductController {
   async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      let { name, quantity, categoryId, image, createdBy, updatedBy }: Product =
+      let { name, quantity, categoryId, image, updatedBy }: Product =
         await req.body;
 
       if (!id) {
@@ -153,29 +160,28 @@ class ProductController {
           .json({ data: null, error: "Product doesnt exist!!", status: 200 });
       }
 
-      if (image) {
-        if (product.image) {
-          unlinkSync(`./public/uploads/${product.image}`);
-        }
+      if (product.image == image) {
+        image = product.image;
       } else {
-        if (product.image) {
-          image = product.image;
-        }
+        unlinkSync(`./public/uploads/${product.image}`);
       }
 
-      const response = await db.product.create({
+      const response = await db.product.update({
+        where: {
+          id,
+        },
         data: {
           name: name,
           quantity: quantity,
           image: image,
           categoryId,
-          createdBy,
           updatedBy,
         },
       });
 
       return res.status(200).json({ data: response, error: null, status: 200 });
     } catch (error) {
+      console.log(error);
       return res
         .status(500)
         .json({ data: null, error: "Something went wrong", status: 500 });
