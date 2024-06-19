@@ -22,23 +22,24 @@ productRoute.get("/", ProductController.getAll);
 productRoute.get("/:id", ProductController.getById);
 
 /**
+ * Route to get a product by Product ID.
+ * @route GET /:id
+ * @param {string} id - The ID of the category.
+ */
+productRoute.get("/categories/:id", ProductController.getByCategoryId);
+
+/**
  * Route to create a new product.
  * @route POST /create
- * @param {File} image - The image file for the product.
  */
-productRoute.post("/create", upload.single("image"), ProductController.create);
+productRoute.post("/create", ProductController.create);
 
 /**
  * Route to update a product by ID.
  * @route PUT /update/:id
  * @param {string} id - The ID of the product to update.
- * @param {File} image - The updated image file for the product.
  */
-productRoute.put(
-  "/update/:id",
-  upload.single("image"),
-  ProductController.update
-);
+productRoute.put("/update/:id", ProductController.update);
 
 /**
  * Route to delete a product by ID.

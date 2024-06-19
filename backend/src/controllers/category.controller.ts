@@ -55,7 +55,7 @@ class CategoryController {
    */
   async create(req: Request, res: Response) {
     try {
-      const { name }: Category = await req.body;
+      const { name }  = await req.body;
 
       if (!name) {
         return res

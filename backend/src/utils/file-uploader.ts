@@ -1,5 +1,6 @@
 import { Request } from "express";
 import multer from "multer";
+import path from "path";
 
 const FILE_SIZE = 1024 * 1024 * 5;
 const FILES = 1;
@@ -9,7 +10,7 @@ const FILES = 1;
  */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./public/uploads/");
+    cb(null, path.join("public", "uploads"));
   },
   filename: (req, file, cb) => {
     const suffix = Date.now() + "_" + file.originalname;
@@ -49,9 +50,19 @@ const multerFilter = (
  */
 export const upload = multer({
   storage: storage,
-  fileFilter: multerFilter,
+  // fileFilter: multerFilter,
   limits: {
     fileSize: FILE_SIZE,
     files: FILES,
   },
 });
+
+// export const upload = (options?: multer.Options) =>
+//   multer({
+//     storage: options?.storage || storage,
+//     fileFilter: options?.fileFilter || multerFilter,
+//     limits: {
+//       fileSize: options?.limits?.fileSize || FILE_SIZE,
+//       files: options?.limits?.files || FILES,
+//     },
+//   });

@@ -60,7 +60,7 @@ class userController {
    */
   async create(req: Request, res: Response) {
     try {
-      const { username, password }: User = await req.body;
+      const { username, password } = await req.body;
       const file = req.file;
 
       let filename = file ? file.filename : null;

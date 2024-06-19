@@ -20,38 +20,44 @@ class AuthenticationController {
       const { username, password }: User = await req.body;
 
       if (!username || !password) {
-        return res.json({
+        return res.status(200).json({
           data: null,
           error: "Username/Password null",
-          status: 400,
+          status: 200,
         });
       }
 
-      const user = await db.user.findUnique({
+      const user = await db.user.findFirst({
         where: {
           username,
         },
       });
 
       if (!user) {
-        return res.json({
+        return res.status(200).json({
           data: null,
           error: "User doesnt exist!",
-          status: 415,
+          status: 200,
         });
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (!passwordMatch) {
-        return res.json({
+        return res.status(200).json({
           data: null,
           error: "Password doesnt match",
-          status: 400,
+          status: 200,
         });
       }
 
-      return res.status(200).json({ data: user, error: null, status: 200 });
+      const data = {
+        id: user.id,
+        username: user.username,
+        image: user.image,
+      };
+
+      return res.status(201).json({ data: data, error: null, status: 201 });
     } catch (error) {
       return res.status(500).json({ data: null, error: error, status: 500 });
     }
@@ -66,39 +72,38 @@ class AuthenticationController {
    */
   async register(req: Request, res: Response) {
     try {
-      const { username, password }: User = await req.body;
-      const file = req.file;
+      const { username, password, image }: User = await req.body;
 
-      let filename = file ? file.filename : null;
-
-      const user = await db.user.findUnique({
+      const user = await db.user.findFirst({
         where: {
           username,
         },
       });
 
       if (user) {
-        if (file) {
-          unlinkSync(`./public/uploads/${filename}`);
+        if (image) {
+          unlinkSync(`./public/uploads/${image}`);
         }
         return res
-          .status(415)
-          .json({ data: null, error: "User already exist!!", status: 415 });
+          .status(200)
+          .json({ data: null, error: "User already exist!!", status: 200 });
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const passwordHash = await bcrypt.hash(password, 10);
 
       const response = await db.user.create({
         data: {
           username: username,
-          password: hashedPassword,
-          image: filename,
+          password: passwordHash,
+          image: image,
         },
       });
 
-      return res.status(200).json({ data: response, error: null, status: 200 });
+      return res.status(201).json({ data: response, error: null, status: 201 });
     } catch (error) {
-      return res.status(500).json({ data: null, error: error, status: 500 });
+      return res
+        .status(500)
+        .json({ data: null, error: "Something went wrong", status: 500 });
     }
   }
 }

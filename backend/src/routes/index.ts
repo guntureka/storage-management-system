@@ -3,6 +3,7 @@ import { categoryRoute } from "@/routes/category";
 import { userRoute } from "@/routes/user";
 import { productRoute } from "@/routes/product";
 import authRoute from "@/routes/auth";
+import uploadRoute from "./upload";
 
 /**
  * Express router for handling routes.
@@ -24,4 +25,9 @@ route.use("/categories", categoryRoute);
  */
 route.use("/products", productRoute);
 
+/**
+ * Mounts the authentication routes on the "/auth" path.
+ */
 route.use("/auth", authRoute);
+
+route.use("/uploads", uploadRoute);
