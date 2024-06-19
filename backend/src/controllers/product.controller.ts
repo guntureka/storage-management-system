@@ -14,7 +14,7 @@ class ProductController {
     try {
       const response = await db.product.findMany({
         orderBy: {
-          updatedAt: "asc",
+          updatedAt: "desc",
         },
       });
 
@@ -77,7 +77,7 @@ class ProductController {
           categoryId: id,
         },
         orderBy: {
-          updatedAt: "asc",
+          updatedAt: "desc",
         },
       });
 

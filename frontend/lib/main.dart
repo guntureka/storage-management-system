@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/pages/add_product_page.dart';
 import 'package:frontend/pages/home_page.dart';
@@ -9,7 +11,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
-  await _userCheck();
   runApp(const MyApp());
 }
 
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.quicksandTextTheme(),
       ),
       initialRoute: '/login',
+
       // home: const HomePage(),
       getPages: [
         GetPage(
@@ -57,13 +59,22 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Future<void> _userCheck() async {
-  final prefs = await SharedPreferences.getInstance();
-  final userData = prefs.getString('user');
+// class AuthMiddleware extends GetMiddleware {
+//   final List<String> publicRoutes = [
+//     '/',
+//     '/add-product',
+//     '/update-product/:id'
+//   ];
 
-  if (userData != null) {
-    Get.offAllNamed("/");
-  } else {
-    Get.offAllNamed('/login');
-  }
-}
+//   @override
+//   redirect(String? route) async {
+//     final prefs = await SharedPreferences.getInstance();
+//     final isAuthenticated = prefs.getString('user') != null;
+
+//     if (!publicRoutes.contains(route) && !isAuthenticated) {
+//       return const RouteSettings(name: '/login');
+//     }
+
+//     return null; // Allow access for public routes or authenticated users
+//   }
+// }
