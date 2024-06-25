@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
@@ -40,6 +41,8 @@ class ProductService {
         updatedBy: username,
       );
       final jsonData = product.toJson();
+
+      print(jsonData.toString());
 
       final Response response = await DioHelper.dio.put(
         '/products/update/$id',

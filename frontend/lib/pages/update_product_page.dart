@@ -42,11 +42,34 @@ class UpdateProductPage extends GetView<UpdateProductController> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: _productUI(context),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: _formUI(context),
           ),
         ],
       ),
     );
+  }
+
+  Widget _productUI(BuildContext context) {
+    return Obx(() => controller.product.value != null
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Created By: ${controller.product.value!.createdBy!}'),
+              Text('Updated By: ${controller.product.value!.updatedBy!}'),
+              Text('Created At: ${controller.product.value!.createdAt!}'),
+              Text('Updated At: ${controller.product.value!.updatedAt!}'),
+              const SizedBox(
+                height: 20,
+              ),
+            ],
+          )
+        : const SizedBox(
+            height: 0,
+          ));
   }
 
   PreferredSizeWidget _appBarUI(BuildContext context) {

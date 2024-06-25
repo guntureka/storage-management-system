@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:frontend/pages/add_product_page.dart';
 import 'package:frontend/pages/home_page.dart';
@@ -8,9 +6,8 @@ import 'package:frontend/pages/register_page.dart';
 import 'package:frontend/pages/update_product_page.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-void main() async {
+void main() {
   runApp(const MyApp());
 }
 
